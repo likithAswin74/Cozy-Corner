@@ -12,7 +12,7 @@ import random
 import time
 import smtplib
 import os
-import threading
+
 
 
 # enables a admin interface like django to add the contents in the database
@@ -420,7 +420,7 @@ def forgot_password():
         email = os.environ.get("RESTAURANT_EMAIL")
         password = os.environ.get("RESTAURANT_PASSWORD")
 
-        with smtplib.SMTP("smtp.gmail.com",587) as connection:
+        with smtplib.SMTP("smtp.gmail.com") as connection:
             connection.starttls()
             connection.login(user=email, password=password)
             msg = f"subject:OTP verification\n\n The OTP to change the password is {otp_generated}. The OTP is valid for 1 minute"
@@ -492,18 +492,6 @@ def about_us():
                            cart_items_count=CART_ITEMS_COUNT)
 
 
-# this is the function which handles the email. it is running with the help of threads so the process will not be delayed
-def send_email_async(subject, message, to_email, from_email, from_password):
-    try:
-        with smtplib.SMTP("smtp.gmail.com") as connection:
-            connection.starttls()
-            # sending the contact form entered details to our email with our email
-            connection.login(user=from_email, password=from_password)
-            connection.sendmail(from_addr=from_email, to_addrs=to_email, msg=f"Subject:{subject}\n\n{message}")
-    except Exception as e:
-        print(f"Error sending email: {e}")
-
-
 @app.route('/contact', methods=['GET', 'POST'])
 def contact_us():
 
@@ -518,12 +506,14 @@ def contact_us():
         # sending the message the user given in the contact form to us through email
         email = os.environ.get("RESTAURANT_EMAIL")
         password = os.environ.get("RESTAURANT_PASSWORD")
-        subject = f"Message from {form.name.data}"
-        message = form.message.data
 
-        # Send email asynchronously with the help of threads. passing all the parameters
-        threading.Thread(target=send_email_async, args=(subject, message, email, email, password)).start()
-
+        with smtplib.SMTP("smtp.gmail.com", 587) as connection:
+            connection.starttls()
+            connection.login(user=email, password=password)
+            # sending the name and the message of the user to our email
+            msg = f"subject:Message from{form.name.data}\n\n {form.message.data}"
+            connection.sendmail(from_addr=email, to_addrs=email,
+                                msg=msg)
 
         # sending the success message as a flash
         flash('Thank you for your message! We will get back to you soon.', 'success')
