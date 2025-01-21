@@ -420,7 +420,7 @@ def forgot_password():
         email = os.environ.get("RESTAURANT_EMAIL")
         password = os.environ.get("RESTAURANT_PASSWORD")
 
-        with smtplib.SMTP("smtp.gmail.com") as connection:
+        with smtplib.SMTP("smtp.gmail.com",587) as connection:
             connection.starttls()
             connection.login(user=email, password=password)
             msg = f"subject:OTP verification\n\n The OTP to change the password is {otp_generated}. The OTP is valid for 1 minute"
