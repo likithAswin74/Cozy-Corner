@@ -492,7 +492,6 @@ def about_us():
                            cart_items_count=CART_ITEMS_COUNT)
 
 
-
 # this is the function which handles the email. it is running with the help of threads so the process will not be delayed
 def send_email_async(subject, message, to_email, from_email, from_password):
     try:
