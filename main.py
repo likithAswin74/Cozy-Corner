@@ -391,7 +391,7 @@ def forgot_password():
 
     # If the first form (forgot password) is submitted
     if forgot_password_form.validate_on_submit():
-        # storing the email in the session
+        # storing the email in the session, because to verify the otp we need to use email to take the generated otp from the database
         session['entered_email'] = forgot_password_form.email.data
 
         # checking that the entered email is in the user database. if no then sending the flash message
@@ -402,7 +402,7 @@ def forgot_password():
             return render_template("forgot_password.html", forgot=forgot_password_form, verify_otp=verifyotp_form,
                                    otp_verified=otp_verified)
 
-        # Generate OTP and send it (you can add your OTP generation logic here)
+        # Generate OTP and send it
         # Store OTP and timestamp in session or database
         otp_generated = random.randint(100000, 999999)
 
@@ -442,7 +442,9 @@ def forgot_password():
             db.session.delete(otp_obj)
             db.session.commit()
             return redirect(url_for("new_password"))
+        # redirecting to the new_password route so that the emails still in the session. so we can use it
         else:
+            # if the if-condition fails we also need to delete the otp_obj
             if otp_obj:  # Ensure the object exists before attempting deletion
                 db.session.delete(otp_obj)
                 db.session.commit()
@@ -457,7 +459,6 @@ def forgot_password():
 @app.route("/new_password", methods=['POST', 'GET'])
 def new_password():
     new_password_form = NewPasswordForm()
-
     if new_password_form.validate_on_submit():
         # checking the new_password and the confirm_password is same.
         verified_email = session['entered_email']
@@ -470,6 +471,8 @@ def new_password():
             user_obj = db.session.execute(db.select(Users).where(Users.email == verified_email)).scalar()
             user_obj.password = hashed_password
             db.session.commit()
+            # Clear the email from the session after success
+            session.pop('entered_email', None)
             flash("password changed successfully")
             return redirect(url_for("login"))
 
