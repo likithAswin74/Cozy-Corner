@@ -12,7 +12,7 @@ import random
 import time
 import smtplib
 import os
-# used to remove the spaces in the parameters from the route
+# used to remove the %20 in the parameters from the route
 from urllib.parse import unquote
 
 
