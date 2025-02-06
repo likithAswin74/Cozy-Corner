@@ -48,7 +48,6 @@ Bootstrap5(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
 # every time it is called when request is made
 # Create a user_loader callback
 @login_manager.user_loader
