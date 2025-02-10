@@ -21,7 +21,6 @@ from flask_admin.contrib.sqla import ModelView
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
 CART_ITEMS_COUNT = 0
 
 
